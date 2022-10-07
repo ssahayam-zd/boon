@@ -1,3 +1,3 @@
 addCommandAlias("check", ";clean;coverage;test;coverageReport")
-coverageMinimum := 50
-coverageFailOnMinimum := true
+// coverageMinimum := 50
+// coverageFailOnMinimum := true

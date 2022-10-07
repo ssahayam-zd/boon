@@ -1,6 +1,6 @@
 lazy val scala212 = "2.12.13"
 
-lazy val scala213 = "2.13.4"
+lazy val scala213 = "2.13.9"
 
 lazy val supportedScalaVersions = List(scala213, scala212)
 
@@ -24,7 +24,7 @@ lazy val commonSettings = Seq(
                       "-language:higherKinds"
                     ),
 
-  scalacOptions in (Compile, console) := Seq(
+  Compile/  console / scalacOptions := Seq(
                       "-encoding", "utf-8",
                       "-unchecked",
                       "-deprecation",
@@ -36,7 +36,7 @@ lazy val commonSettings = Seq(
 
   sonatypeCredentialHost := "s01.oss.sonatype.org",
 
-  scalacOptions in (Test, console) := (scalacOptions in (Compile, console)).value
+  Test / console / scalacOptions := (Compile / console / scalacOptions).value
 )
 
 lazy val scalaReflect = Def.setting { "org.scala-lang" % "scala-reflect" % scalaVersion.value }
