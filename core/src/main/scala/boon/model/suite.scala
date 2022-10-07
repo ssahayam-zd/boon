@@ -106,6 +106,6 @@ object SuiteResult {
       case TestState.Ignored => false
     }
 
-   failedOp.fold[SuiteState](SuiteState.Passed)(_ => SuiteState.Failed)
+    failedOp.fold[SuiteState](SuiteState.Passed)(_ => SuiteState.Failed)
   }
 }

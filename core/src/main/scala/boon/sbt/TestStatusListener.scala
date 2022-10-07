@@ -33,26 +33,26 @@ final class BoonTestStatusListener(
         case SuiteState.Failed => stats.copy(suites = stats.suites.copy(failed = stats.suites.failed + 1))
       }
 
-      val testCounts =
-        result.testResults.map(TestResult.testResultToTestState).foldLeft(suiteCounts) {
-          case (acc, TestState.Passed)  => acc.copy(tests = acc.tests.copy(statusCount = acc.tests.statusCount.copy(passed  = acc.tests.statusCount.passed + 1)))
-          case (acc, TestState.Failed)  => acc.copy(tests = acc.tests.copy(statusCount = acc.tests.statusCount.copy(failed  = acc.tests.statusCount.failed + 1)))
-          case (acc, TestState.Ignored) => acc.copy(tests = acc.tests.copy(ignored = acc.tests.ignored + 1))
-        }
+    val testCounts =
+      result.testResults.map(TestResult.testResultToTestState).foldLeft(suiteCounts) {
+        case (acc, TestState.Passed)  => acc.copy(tests = acc.tests.copy(statusCount = acc.tests.statusCount.copy(passed  = acc.tests.statusCount.passed + 1)))
+        case (acc, TestState.Failed)  => acc.copy(tests = acc.tests.copy(statusCount = acc.tests.statusCount.copy(failed  = acc.tests.statusCount.failed + 1)))
+        case (acc, TestState.Ignored) => acc.copy(tests = acc.tests.copy(ignored = acc.tests.ignored + 1))
+      }
 
-      val newStats =
-        result.testResults.map(TestResult.testResultToAssertionCount).foldLeft(testCounts) {
-          case (acc, AssertionCount(StatusCount(pass, fail), notRun)) =>
-            acc.copy(assertions =
-                      acc.assertions.copy(statusCount =
-                                            acc.assertions.statusCount.copy(passed = acc.assertions.statusCount.passed + pass,
-                                                                            failed = acc.assertions.statusCount.failed + fail),
-                                            notRun = acc.assertions.notRun + notRun))
-        }
+    val newStats =
+      result.testResults.map(TestResult.testResultToAssertionCount).foldLeft(testCounts) {
+        case (acc, AssertionCount(StatusCount(pass, fail), notRun)) =>
+          acc.copy(assertions =
+                    acc.assertions.copy(statusCount =
+                                          acc.assertions.statusCount.copy(passed = acc.assertions.statusCount.passed + pass,
+                                                                          failed = acc.assertions.statusCount.failed + fail),
+                                          notRun = acc.assertions.notRun + notRun))
+      }
 
-      val _ = atomicStats.updateAndGet(newStats +: _)
-      ()
-    }
+    val _ = atomicStats.updateAndGet(newStats +: _)
+    ()
+  }
 
   override def suiteFailed(reason: String, error: Throwable, loggers: Array[Logger]): Unit = {
     atomicResults.updateAndGet(SuiteFailureTask(reason, error, loggers) +: _)

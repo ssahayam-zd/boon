@@ -100,7 +100,7 @@ object SuiteOutput {
             val assertionOutputs: NonEmptySeq[AssertionOutput] =
               one(SequentialFailedOutput(name, failedData, passed.map(an => SequentialPassData(an.name.value)), notRun.map(an => SequentialNotRunData(an.name.value))))
 
-          TestPassedOutput(TestResult.testName(tr).value, assertionOutputs, testResultToTestState(tr))
+            TestPassedOutput(TestResult.testName(tr).value, assertionOutputs, testResultToTestState(tr))
 
         case CompositeTestResult(AllPassed(TestName(name), passed)) =>
           val assertionOutputs: NonEmptySeq[AssertionOutput] =

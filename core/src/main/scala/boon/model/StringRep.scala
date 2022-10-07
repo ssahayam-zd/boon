@@ -43,49 +43,49 @@ object StringRep {
 
   def genericStringRep[A]: StringRep[A] = from[A](_.toString)
 
-  implicit val intStringRep     = genericStringRep[Int]
-  implicit val longStringRep    = genericStringRep[Long]
-  implicit val booleanStringRep = genericStringRep[Boolean]
-  implicit val floatStringRep   = genericStringRep[Float]
-  implicit val doubleStringRep  = genericStringRep[Double]
+  implicit val intStringRep: StringRep[Int]     = genericStringRep[Int]
+  implicit val longStringRep: StringRep[Long]    = genericStringRep[Long]
+  implicit val booleanStringRep: StringRep[Boolean] = genericStringRep[Boolean]
+  implicit val floatStringRep: StringRep[Float]   = genericStringRep[Float]
+  implicit val doubleStringRep: StringRep[Double]  = genericStringRep[Double]
 
-  implicit val stringStringRep = from[String](str => s""""$str"""")
+  implicit val stringStringRep: StringRep[String] = from[String](str => s""""$str"""")
 
-  implicit val charStringRep = from[Char](c => s"'$c'")
+  implicit val charStringRep: StringRep[Char] = from[Char](c => s"'$c'")
 
-  private def colStringRep[A: StringRep, F[_]](toIt: F[A] => Iterable[A])(prefix: String, open: String, close: String) =
+  private def colStringRep[A: StringRep, F[_]](toIt: F[A] => Iterable[A])(prefix: String, open: String, close: String): StringRep[F[A]] =
     from[F[A]](fa => toIt(fa).map(StringRep[A].strRep).mkString(s"${prefix}${open}", ", ", s"${close}"))
 
   implicit def arrayStringRep[A](implicit S: StringRep[A]): StringRep[Array[A]] =
     colStringRep[A, Array](_.toSeq)("Array", "[", "]")
 
-  implicit def listStringRep[A: StringRep] = colStringRep[A, List](_.toSeq)("List", "(", ")")
+  implicit def listStringRep[A: StringRep]: StringRep[List[A]] = colStringRep[A, List](_.toSeq)("List", "(", ")")
 
-  implicit def vectorStringRep[A: StringRep] = colStringRep[A, Vector](_.toSeq)("Vector", "(", ")")
+  implicit def vectorStringRep[A: StringRep]: StringRep[Vector[A]] = colStringRep[A, Vector](_.toSeq)("Vector", "(", ")")
 
-  implicit def setStringRep[A: StringRep] = colStringRep[A, Set](_.toSeq)("Set", "(", ")")
+  implicit def setStringRep[A: StringRep]: StringRep[Set[A]] = colStringRep[A, Set](_.toSeq)("Set", "(", ")")
 
-  implicit def seqStringRep[A: StringRep] = colStringRep[A, Seq](_.toSeq)("Seq", "(", ")")
+  implicit def seqStringRep[A: StringRep]: StringRep[Seq[A]] = colStringRep[A, Seq](_.toSeq)("Seq", "(", ")")
 
-  implicit def nonEmptySeqStringRep[A: StringRep] = from[NonEmptySeq[A]](_.map(StringRep[A].strRep).mkString("NES(", ",", ")"))
+  implicit def nonEmptySeqStringRep[A: StringRep]: StringRep[NonEmptySeq[A]] = from[NonEmptySeq[A]](_.map(StringRep[A].strRep).mkString("NES(", ",", ")"))
 
-  implicit def eitherStringRep[A: StringRep, B: StringRep] =
+  implicit def eitherStringRep[A: StringRep, B: StringRep]: StringRep[Either[A,B]] =
     from[Either[A, B]](_.fold(l => s"Left(${StringRep[A].strRep(l)})", r => s"Right(${StringRep[B].strRep(r)})"))
 
-  implicit def throwableStringRep = from[Throwable](t => s"${t.getClass.getName}(${t.getMessage})")
+  implicit def throwableStringRep: StringRep[Throwable] = from[Throwable](t => s"${t.getClass.getName}(${t.getMessage})")
 
-  implicit def tryStringRep[A: StringRep] =
+  implicit def tryStringRep[A: StringRep]: StringRep[Try[A]] =
     from[Try[A]](_.fold(t => s"Failure(${StringRep[Throwable].strRep(t)})", success => s"Success(${StringRep[A].strRep(success)})"))
 
-  implicit def optionStringRep[A: StringRep] = from[Option[A]](_.fold("None")(v => s"Some(${StringRep[A].strRep(v)})"))
+  implicit def optionStringRep[A: StringRep]: StringRep[Option[A]] = from[Option[A]](_.fold("None")(v => s"Some(${StringRep[A].strRep(v)})"))
 
-  implicit def pairStringRep[A: StringRep, B: StringRep] =
+  implicit def pairStringRep[A: StringRep, B: StringRep]: StringRep[(A, B)] =
     from[(A, B)](pair => s"(${StringRep[A].strRep(pair._1)}, ${StringRep[B].strRep(pair._2)})")
 
-  implicit def tripleStringRep[A: StringRep, B: StringRep, C: StringRep] =
+  implicit def tripleStringRep[A: StringRep, B: StringRep, C: StringRep]: StringRep[(A, B, C)] =
     from[(A, B, C)](triple => s"(${StringRep[A].strRep(triple._1)}, ${StringRep[B].strRep(triple._2)}, ${StringRep[C].strRep(triple._3)})")
 
-  implicit def tuple4StringRep[A: StringRep, B: StringRep, C: StringRep, D: StringRep] =
+  implicit def tuple4StringRep[A: StringRep, B: StringRep, C: StringRep, D: StringRep]: StringRep[(A, B, C, D)] =
     from[(A, B, C, D)]{ tuple =>
       "(" +
         s"${StringRep[A].strRep(tuple._1)}, "  +
@@ -95,6 +95,6 @@ object StringRep {
       ")"
     }
 
-  implicit def mapStringRep[A: StringRep, B: StringRep] =
+  implicit def mapStringRep[A: StringRep, B: StringRep]: StringRep[Map[A,B]] =
     from[Map[A, B]](_.map { case (k, v) =>  s"${StringRep[A].strRep(k)} -> ${StringRep[B].strRep(v)}" }.mkString("Map(", ",", ")"))
 }

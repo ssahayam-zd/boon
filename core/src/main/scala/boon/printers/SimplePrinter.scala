@@ -75,12 +75,12 @@ object SimplePrinter extends BoonPrinter {
     case FailedOutput(name, errors, trace, ctx, loc) =>
       val location = correlateLocation(trace, loc).getOrElse("")
 
-      val baseError =
+      val baseError: String =
         s"${ps.assertion.padding} - ${name} ${ps.assertion.tokens.common.failed}${EOL}" +
         exceptionTrace(ps, trace) +
         errorLines(errors, location, ps)
 
-        contextString(ps, ctx, baseError)
+      contextString(ps, ctx, baseError)
 
     case SequentialPassedOutput(_, passed) =>
       val compositePasses = passed.map(pa => s"${ps.assertion.padding} ${ps.assertion.compositePrefix} ${pa.name} ${ps.assertion.tokens.common.passed}").mkString(EOL)

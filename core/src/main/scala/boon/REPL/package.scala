@@ -17,6 +17,7 @@ object ReplConfig {
 }
 
 package object REPL {
+
   //load this in from a file
   private val suiteNames =
     oneOrMore(
